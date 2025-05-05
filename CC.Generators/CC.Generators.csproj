@@ -19,6 +19,7 @@
 		<RepositoryUrl>https://github.com/chrcar01/CC.Generators</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -27,7 +28,9 @@
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<!-- Do not include the generator as a lib dependency -->
 	</PropertyGroup>
-
+	<ItemGroup>
+		<None Include="..\README.md" Pack="true" PackagePath="." />
+	</ItemGroup>
 	<ItemGroup>
 		<!-- Package the generator in the analyzer directory of the nuget package -->
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
