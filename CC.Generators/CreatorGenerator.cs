@@ -227,7 +227,7 @@ namespace CC.Generators
             
             var result = new TestClassToGenerate(classSymbol.Name, targetType)
             {
-                ResultType = targetType.AllInterfaces.FirstOrDefault(x => x.Name == "I" + targetType.Name),
+                ResultType = targetType.AllInterfaces.FirstOrDefault(x => x.Name == "I" + targetType.Name) ?? targetType as INamedTypeSymbol,
                 Usings = GetUsingNamespaces(classDeclarationSyntax),
                 Namespace = GetNamespace(classDeclarationSyntax)
             };
