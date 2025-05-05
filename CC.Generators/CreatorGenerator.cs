@@ -85,7 +85,12 @@ namespace CC.Generators
                 code.WriteLine($"namespace {testClassToGenerate?.Namespace}");
                 code.WriteLine("{");
                 code.Indent = 1;
-                code.WriteLine($"public partial class {testClassToGenerate?.Name}");
+                var accessibility = "public";
+                if (!string.IsNullOrWhiteSpace(testClassToGenerate?.Accessibility))
+                {
+                    accessibility = testClassToGenerate?.Accessibility;
+                }
+                code.WriteLine($"{accessibility} partial class {testClassToGenerate?.Name}");
                 code.WriteLine("{");
                 code.Indent = 2;
                 var resultTypeName = testClassToGenerate?.ResultType?.Name ?? string.Empty;
@@ -224,8 +229,9 @@ namespace CC.Generators
             {
                 return null; // when would this happen???
             }
-            
-            var result = new TestClassToGenerate(classSymbol.Name, targetType)
+
+            var accessibility = classSymbol.DeclaredAccessibility.ToString().ToLower();
+            var result = new TestClassToGenerate(classSymbol.Name, accessibility, targetType)
             {
                 ResultType = targetType.AllInterfaces.FirstOrDefault(x => x.Name == "I" + targetType.Name) ?? targetType as INamedTypeSymbol,
                 Usings = GetUsingNamespaces(classDeclarationSyntax),
@@ -255,12 +261,14 @@ namespace CC.Generators
         }
     }
 
-    public record TestClassToGenerate(string Name, ITypeSymbol TargetType)
+    public record TestClassToGenerate(string Name, string Accessibility, ITypeSymbol TargetType)
 
     {
         public readonly string Name = Name;
 
         public readonly ITypeSymbol TargetType = TargetType;
+
+        public readonly string Accessibility = Accessibility;
 
         public INamedTypeSymbol? ResultType { get; set; }
         public IEnumerable<string>? Usings { get; set; }
