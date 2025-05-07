@@ -9,7 +9,7 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>true</ImplicitUsings>
 		<LangVersion>Latest</LangVersion>
-		<VersionPrefix>0.0.1</VersionPrefix>
+		<VersionPrefix>0.0.3</VersionPrefix>
 		<PackageId>CC.Generators</PackageId>
 		<Authors>Chris Carter</Authors>
 		<Company>Chris Carter</Company>
