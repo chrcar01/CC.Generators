@@ -9,11 +9,11 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>true</ImplicitUsings>
 		<LangVersion>Latest</LangVersion>
-		<VersionPrefix>0.0.3</VersionPrefix>
+		<VersionPrefix>1.0.0</VersionPrefix>
 		<PackageId>CC.Generators</PackageId>
 		<Authors>Chris Carter</Authors>
 		<Company>Chris Carter</Company>
-		<Description>Useful Source Generators</Description>
+		<Description>Create method source generator for unit testing.</Description>
 		<Copyright>Copyright (c) 2025 Chris Carter</Copyright>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryUrl>https://github.com/chrcar01/CC.Generators</RepositoryUrl>
@@ -33,7 +33,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<!-- Package the generator in the analyzer directory of the nuget package -->
-		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+		<!--<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />-->
 	</ItemGroup>
 
 	<!-- The following libraries include the source generator interfaces and types we need -->

@@ -1,9 +1,8 @@
-﻿using System.CodeDom.Compiler;
-using System.Diagnostics;
-using System.Text;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using System.CodeDom.Compiler;
+using System.Text;
 
 namespace CC.Generators
 {
@@ -165,6 +164,11 @@ namespace CC.Generators
                     }
 
                     // Extract the named argument "Target"
+                    if (attributeSyntax.ArgumentList == null)
+                    {
+                        continue;
+                    }
+
                     foreach (var argument in attributeSyntax.ArgumentList.Arguments)
                     {
                         if (argument.NameEquals?.Name.Identifier.Text == "Target")
@@ -175,7 +179,8 @@ namespace CC.Generators
                                 var typeSymbol = ctx.SemanticModel.GetTypeInfo(expression.Type).Type;
                                 if (typeSymbol != null)
                                 {
-                                    return GetTestClassToGenerate(ctx.SemanticModel, classDeclarationSyntax, typeSymbol);
+                                    return GetTestClassToGenerate(ctx.SemanticModel, classDeclarationSyntax,
+                                        typeSymbol);
                                 }
                             }
                         }
