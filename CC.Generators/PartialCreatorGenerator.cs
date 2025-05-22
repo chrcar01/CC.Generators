@@ -7,22 +7,23 @@ using System.Text;
 namespace CC.Generators
 {
     [Generator]
-    public class CreatorGenerator : IIncrementalGenerator
+    public class PartialCreatorGenerator : IIncrementalGenerator
     {
         public const string Attribute = @"#nullable enable
 using System;
 namespace CC.Generators
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class CreatorAttribute : Attribute
+    public class PartialCreatorAttribute : Attribute
     {        
         public Type? Target;
     }
 }";
+
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             context.RegisterPostInitializationOutput(static ctx => ctx.AddSource(
-                "CreatorAttribute.g.cs", SourceText.From(Attribute, Encoding.UTF8)));
+                "PartialCreatorAttribute.g.cs", SourceText.From(Attribute, Encoding.UTF8)));
 
             IncrementalValuesProvider<TestClassToGenerate?> testClassesToGenerate = context.SyntaxProvider
                 .CreateSyntaxProvider(
@@ -79,7 +80,7 @@ namespace CC.Generators
                 {
                     code.WriteLine($"using {@using};");
                 }
-                
+
                 code.WriteLine();
                 code.WriteLine($"namespace {testClassToGenerate?.Namespace}");
                 code.WriteLine("{");
@@ -93,11 +94,11 @@ namespace CC.Generators
                 code.WriteLine("{");
                 code.Indent = 2;
                 var resultTypeName = testClassToGenerate?.ResultType?.Name ?? string.Empty;
-                code.Write($"private static {resultTypeName} Create{targetType.Name}(");
+                code.Write($"private static Mock<{targetType.Name}> Create{targetType.Name}Partial(");
                 code.WriteLine("MockBehavior defaultBehavior = MockBehavior.Loose,");
                 code.Indent++;
-                
-                for (var paramIndex=0;paramIndex<@params.Length;paramIndex++)
+
+                for (var paramIndex = 0; paramIndex < @params.Length; paramIndex++)
                 {
                     var param = @params[paramIndex];
                     code.Write($"{param.Type.Name}? {param.Name} = null");
@@ -108,7 +109,7 @@ namespace CC.Generators
                 code.WriteLine(")");
                 code.WriteLine("{");
                 code.Indent++;
-                code.WriteLine($"return new {targetType.Name}(");
+                code.WriteLine($"return new Mock<{targetType.Name}>(");
                 code.Indent++;
                 for (var paramIndex = 0; paramIndex < @params.Length; paramIndex++)
                 {
@@ -130,7 +131,12 @@ namespace CC.Generators
                     code.WriteLine(paramIndex < @params.Length - 1 ? "," : "");
                 }
                 code.Indent--;
-                code.WriteLine(");");
+                code.WriteLine(")");
+                code.WriteLine("{");
+                code.Indent++;
+                code.WriteLine("CallBase = true ");
+                code.Indent--;
+                code.WriteLine("};");
                 code.Indent--;
                 code.WriteLine("}");
                 code.Indent = 1;
@@ -138,14 +144,14 @@ namespace CC.Generators
                 code.Indent = 0;
                 code.WriteLine("}");
 
-                source.AddSource($"{testClassToGenerate?.Name}.g.cs", SourceText.From(stringWriter.ToString(), Encoding.UTF8));
+                source.AddSource($"{testClassToGenerate?.Name}.PartialMock.g.cs", SourceText.From(stringWriter.ToString(), Encoding.UTF8));
             });
         }
-        
+
         private TestClassToGenerate? GetSemanticTargetForGeneration(GeneratorSyntaxContext ctx)
         {
             var classDeclarationSyntax = (ClassDeclarationSyntax)ctx.Node;
-            
+
             foreach (AttributeListSyntax attributeListSyntax in classDeclarationSyntax.AttributeLists)
             {
                 foreach (AttributeSyntax attributeSyntax in attributeListSyntax.Attributes)
@@ -158,7 +164,7 @@ namespace CC.Generators
                     }
 
                     INamedTypeSymbol attributeContainingTypeSymbol = attributeSymbol.ContainingType;
-                    if (attributeContainingTypeSymbol.ToDisplayString() != "CC.Generators.CreatorAttribute")
+                    if (attributeContainingTypeSymbol.ToDisplayString() != "CC.Generators.PartialCreatorAttribute")
                     {
                         continue;
                     }

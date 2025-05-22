@@ -9,6 +9,81 @@ namespace CC.Generators.Tests;
 public class CreatorGeneratorTests
 {
     [Test]
+    public void Demo2()
+    {
+        var inputCompilation = CreateCompilation(@"
+using InnerApi.Core.Models;
+using InnerApi.Core.Services;
+using InnerApi.Core.Repositories;
+namespace InnerApi.Core.Tests
+{    
+    [TestFixture]
+    [CC.Generators.PartialCreatorAttribute(Target=typeof(AccountsService))]
+    public partial class AccountsServiceTests
+    {   
+    }
+}
+
+namespace InnerApi.Core.Services
+{
+    using InnerApi.Core.Models; 
+    using InnerApi.Core.Repositories;
+    public class AccountsService : IAccountsService
+    {
+        private readonly IAccountsRepository _accountsRepository;
+        public AccountsService(IAccountsRepository accountsRepository)
+        {
+            _accountsRepository = accountsRepository;
+        }
+        public async Task<Account> GetAccount(string accountId)
+        {
+            return await _accountsRepository.GetAccount(accountId);
+        }
+    }
+
+    public interface IAccountsService
+    {
+        Account GetAccount(string accountId);
+    }
+}
+    
+namespace InnerApi.Core.Repositories
+{
+    using InnerApi.Core.Models;
+    public interface IAccountsRepository
+    {
+        Task<Account> GetAccount(string accountId);
+    }
+}
+
+namespace InnerApi.Core.Models
+{
+    public class Account
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+    }
+}
+");
+        var generator = new PartialCreatorGenerator();
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+        driver = driver.RunGeneratorsAndUpdateCompilation(inputCompilation, out var outputCompilation, out var diagnostics);
+
+        //Assert.That(outputCompilation.SyntaxTrees.Count(), Is.EqualTo(2));
+
+        GeneratorDriverRunResult runResult = driver.GetRunResult();
+
+
+        var generatorRunResult = runResult.Results.First();
+        foreach (var generatedSourceResult in generatorRunResult.GeneratedSources)
+        {
+            var fileContent = generatedSourceResult.SourceText.ToString();
+            Console.WriteLine(fileContent);
+        }
+
+    }
+
+    [Test]
     public void Demo()
     {
         var inputCompilation = CreateCompilation(@"
